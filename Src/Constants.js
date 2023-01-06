@@ -1,0 +1,1 @@
+export const brown = '#9A6039';
