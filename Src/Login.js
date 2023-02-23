@@ -5,9 +5,15 @@ import Background from './Background';
 import { brown } from './Constants';
 import Btn from './Btn';
 import Field from './Fields';
+import {useNavigation} from '@react-navigation/native';
+import Bills from './Bills';
+
 
 // create a component
 const Login = (props) => {
+  const navigation = useNavigation();
+
+
     return (
         <Background>
         <View style={{alignItems: 'center', width: 460}}>
@@ -50,7 +56,7 @@ const Login = (props) => {
               </Text>
             </View>
 
-            <Btn bgcolor={brown} txtcolor='white' btnlabel="Login" Press={()=> alert("Logged in ")}/>
+            <Btn bgcolor={brown} txtcolor='white' btnlabel="Login" Press={()=>navigation.navigate(Bills) }/>
 
             <View style={{ display: 'flex', flexDirection :'row', justifyContent: "center" }}>
               <Text style={{ fontSize: 16, fontWeight:"bold" }}>Don't have an account ? </Text>
