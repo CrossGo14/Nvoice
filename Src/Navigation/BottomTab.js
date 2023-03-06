@@ -5,6 +5,8 @@ import Bills from '../Bills';
 import FoodItems from '../FoodItems';
 import Profile from '../Profile';
 import Icon, { FeatherIcon } from 'react-native-vector-icons/Feather';
+import ProfileNavigator from './ProfileNavigator';
+import TableNavigator from './TableNavigator'
 
 
 const Tab = createBottomTabNavigator();
@@ -26,14 +28,14 @@ function BottomTab() {
         )
         }}} />
 
-      <Tab.Screen name="Table" component={Table} 
+      <Tab.Screen name="Table" component={TableNavigator} 
        options={{tabBarIcon: ({focused})=>{
         return(
         <Icon name='tablet' size={20}></Icon>
         )
         }}}/>
 
-      <Tab.Screen name="Profile" component={Profile}
+      <Tab.Screen name="Profile" component={ProfileNavigator}
        options={{tabBarIcon: ({focused})=>{
         return(
         <Icon name='user' size={20}></Icon>

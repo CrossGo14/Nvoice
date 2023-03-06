@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/Feather';
 
 
 // create a component
-const Profile = (props) => {
+const Profile = (props,{navigation}) => {
     
     const Navigation = useNavigation();
     const Stack=createNativeStackNavigator();

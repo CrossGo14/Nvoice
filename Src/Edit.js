@@ -11,16 +11,15 @@ import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import Icon, { FeatherIcon } from 'react-native-vector-icons/Feather';
 
 
-
 // create a component
-const Edit = (props) => {
-    const sheetref=useRef(null);
+function Edit(){  
+  const sheetref=useRef(null);
     const [isopen,setisopen]=useState(true);
 
 
     const handlepress=useCallback((index)=>{
         sheetref.current?.snapToIndex(index);
-        setisopen(true);
+        setisopen(true); 
     },[]);
 
     const[image,setimage]=useState();
@@ -30,7 +29,6 @@ const Edit = (props) => {
             mediaTypes:ImagePicker.MediaTypeOptions.All,
           allowsEditing: true,
           quality: 1,
-            
         });
         if (!result.canceled) {
           const fileName = result.assets[0].uri.split('/').pop();
@@ -42,21 +40,6 @@ const Edit = (props) => {
           setimage(result.assets[0].uri);        
         }
       };
-
-    // const pickImageAsync = async () => {
-    //     let result = await ImagePicker.launchImageLibraryAsync({
-    //         mediaTypes:ImagePicker.MediaTypeOptions.All,
-    //       allowsEditing: true,
-    //       quality: 1,
-    //     });
-    
-    //     if (!result.canceled) {
-    //         setimage(result.assets[0].uri);
-    //       console.log(result);
-    //     } else {
-    //       alert('You did not select any image.');
-    //     }
-    //   };
 
 const snapPoints=["50%"]
    
@@ -70,7 +53,8 @@ const snapPoints=["50%"]
         enablePanDownToClose={true}
         initialSnap={1}
         onClose={()=>setisopen(false)}>
-            <BottomSheetView>
+            <BottomSheetView
+            initialSnap>
                 <View style={{alignItems:'center'}}>
                 <Text style={{fontSize:25}}>Upload a Photo</Text>
                 <Text style={{fontSize:15,color:'grey'}}>Choose your profile pictre</Text>
@@ -90,12 +74,13 @@ const snapPoints=["50%"]
             </BottomSheetView>
         </BottomSheet>
 
+
         
        
         <View style={{margin:20}}>
 
         <View style={{alignItems:'center'}}>
-            <TouchableOpacity onPress={()=>handlepress(0)}>
+            <TouchableOpacity onPress={()=>handlepress(1)}>
 
             <View style={{
                 height: 100,
@@ -141,7 +126,6 @@ const snapPoints=["50%"]
         </View>
         <Button title='Submit' />
         </View>
-        <Text>{props.Person}</Text>
     </View>
        
     );
@@ -151,6 +135,10 @@ const snapPoints=["50%"]
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    modal:{
+      margin: 0,
+
     },
     panelButtonTitle: {
         fontSize: 17,

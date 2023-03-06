@@ -10,7 +10,6 @@ import { useNavigation } from "@react-navigation/native";
 
 // create a component
 const Table= () => {
-    
     const Navigation = useNavigation();
     const Stack=createNativeStackNavigator();
 
@@ -18,16 +17,11 @@ const Table= () => {
         Navigation.navigate("Tableinfo");
     }
 
-
     return (
         <View style={styles.container}>
-
-            <View>
-            <TouchableOpacity style={styles.plus} onPress={press}>
-                <Image 
-                style={styles.floatingbutton}
-                source={{uri:'https://img.icons8.com/plasticine/512/add.png'}} />
-
+            <View style={styles.floatingbutton} >
+            <TouchableOpacity  onPress={press}>
+                <Icon   name='plus-square' size={34}></Icon>
             </TouchableOpacity>
             </View>
 
@@ -38,9 +32,9 @@ const Table= () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // justifyContent: 'center',
-        // alignItems: 'center',
-        marginHorizontal:scale(10)
+        justifyContent: 'center',
+        alignItems: 'center',
+
     },
     box:{
         width:scale(150),
@@ -49,20 +43,19 @@ const styles = StyleSheet.create({
         backgroundColor:'light-grey',
         marginTop:verticalScale(20),
     },
-    plus:{
+    floatingbutton:{
         justifyContent:'center',
         alignItems:'center',
-
         position:'absolute',
-        width:scale(600),
-        height:verticalScale(1100) 
-
+        paddingLeft:scale(250),
+        paddingTop:verticalScale(450)
     },
-    floatingbutton:{
-        resizeMode:'contain',
-        width:50,
-        height:50
-    }
+    // floatingbutton:{
+    //     resizeMode:'contain',
+    //     width:50,
+    //     height:50,
+    //     marginRight:
+    // }
 });
 
 //make this component available to the app

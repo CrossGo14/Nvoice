@@ -1,13 +1,22 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet,TouchableOpacity } from 'react-native';
+import Icon, { FeatherIcon } from 'react-native-vector-icons/Feather';
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+
+
 
 // create a component
 const FoodItems = () => {
     return (
         <View style={styles.container}>
-            <Text>FoodItems</Text>
+        <View style={styles.floatingbutton} >
+        <TouchableOpacity >
+            <Icon   name='plus-square' size={34}></Icon>
+        </TouchableOpacity>
         </View>
+
+    </View>
     );
 };
 
@@ -17,7 +26,22 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#2c3e50',
+        backgroundColor: 'white',
+    },
+    plus:{
+        justifyContent:'center',
+        alignItems:'center',
+        position:'absolute',
+        width:scale(630),
+        height:verticalScale(1050) 
+
+    },
+    floatingbutton:{
+        justifyContent:'center',
+        alignItems:'center',
+        position:'absolute',
+        paddingLeft:scale(250),
+        paddingTop:verticalScale(450)
     },
 });
 
