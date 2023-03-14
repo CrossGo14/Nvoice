@@ -3,19 +3,29 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet,TouchableOpacity } from 'react-native';
 import Icon, { FeatherIcon } from 'react-native-vector-icons/Feather';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import AddFood from './AddFood';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useNavigation } from "@react-navigation/native";
 
 
 
 // create a component
 const FoodItems = () => {
+    const Navigation = useNavigation();
+    const Stack=createNativeStackNavigator();
+
+
+    const press = ()=>{
+        Navigation.navigate("AddFood");
+    }
+
     return (
         <View style={styles.container}>
         <View style={styles.floatingbutton} >
-        <TouchableOpacity >
-            <Icon   name='plus-square' size={34}></Icon>
+        <TouchableOpacity onPress={press}>
+            <Icon   name='plus-square' size={34} ></Icon>
         </TouchableOpacity>
         </View>
-
     </View>
     );
 };

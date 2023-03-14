@@ -7,6 +7,7 @@ import Profile from '../Profile';
 import Icon, { FeatherIcon } from 'react-native-vector-icons/Feather';
 import ProfileNavigator from './ProfileNavigator';
 import TableNavigator from './TableNavigator'
+import FoodNavigator from './FoodNavigator'
 
 
 const Tab = createBottomTabNavigator();
@@ -21,7 +22,7 @@ function BottomTab() {
     )
     }}}
 /> 
-      <Tab.Screen name="FoodItems" component={FoodItems}
+      <Tab.Screen name="Food" component={FoodNavigator}
        options={{tabBarIcon: ({focused})=>{
         return(
         <Icon name='home' size={20}></Icon>
