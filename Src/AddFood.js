@@ -11,7 +11,6 @@ const[food,setfood]=useState('');
 const[price,setprice]=useState('');
 
 const addfiled=()=>{
-
     const data={
         ItemName:food,
         Price:price
@@ -49,9 +48,6 @@ const addfiled=()=>{
         >
         <Text style={styles.btnText}>Save Food Item</Text>
       </TouchableOpacity>
-
-
-
     </View>
   )
 }
