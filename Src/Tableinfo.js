@@ -9,42 +9,43 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
-  Modal
+  Modal,
+  Pressable
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon, { FeatherIcon } from "react-native-vector-icons/Feather";
-import {firebase} from './config';
-
+import { firebase } from "./config";
 
 // create a component
-const Tableinfo = ({ visible, onClose, onSubmit, note, isEdit })=> {
-  const [tableno, settableno] = useState('');
+const Tableinfo = ({ visible, onClose, onSubmit, note, isEdit }) => {
+  const [tableno, settableno] = useState("");
 
 
-  const handleModalClose = () => {
-    Keyboard.dismiss();
-  };
 
-  const table=firebase.firestore().collection('Table');
+  const table = firebase.firestore().collection("Table");
 
+  const fooditems = firebase.firestore().collection("fooditems");
 
-  const addtable=()=>{
-    const data={
-        Tableno:tableno,
+  const[item,setitem]=useState([]);
+
+  const addtable = () => {
+    const data = {
+      Tableno: tableno,
+      cart:[],
     };
     table
-    .add(data)
-    .then(()=>{
-        settableno(''),
-        Keyboard.dismiss();
-    })
-    .catch((error)=>{
-        alert(error)
+      .add(data)
+      .then(() => {
+        settableno(""), Keyboard.dismiss();
+      })
+      .catch((error) => {
+        alert(error);
+      });
+    alert("Table Added");
+  };
 
-    })
-    alert("Table Added")
-}
- 
+
+
   return (
     <SafeAreaView>
       <View style={styles.action}>
@@ -55,14 +56,12 @@ const Tableinfo = ({ visible, onClose, onSubmit, note, isEdit })=> {
           onChangeText={(text) => settableno(text)}
           style={styles.textinput}
         />
-        <TouchableOpacity onPress={addtable}>
+        <Pressable onPress={addtable}>
           <Text style={styles.tick}>✓</Text>
-        </TouchableOpacity>
-        <Icon name="x" size='17'></Icon>
+        </Pressable>
+        <Icon name="x" size="17"></Icon>
       </View>
     </SafeAreaView>
-
-
   );
 };
 

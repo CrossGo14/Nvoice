@@ -7,6 +7,7 @@ import BottomTab from './BottomTab';
 import Tableinfo from '../Tableinfo';
 import Table from '../Table';
 import Login from '../Login';
+import Tablefood from '../Tablefood';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,8 @@ function ProfileNavigator() {
     <Stack.Navigator  independent={true} initialRouteName={Login}>
         <Stack.Screen name="Table" component={Table} />
         <Stack.Screen name="Tableinfo" component={Tableinfo} />
+        <Stack.Screen name="Tablefood" component={Tablefood} />
+
     </Stack.Navigator>
   );
 }

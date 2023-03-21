@@ -4,7 +4,7 @@ import {firebase} from './config';
 
 export default function AddFood() {
 
-    const fooditem=firebase.firestore().collection('Food Items');
+    const fooditem=firebase.firestore().collection('fooditems');
 
 
 const[food,setfood]=useState('');
@@ -48,6 +48,9 @@ const addfiled=()=>{
         >
         <Text style={styles.btnText}>Save Food Item</Text>
       </TouchableOpacity>
+
+    
+
     </View>
   )
 }
