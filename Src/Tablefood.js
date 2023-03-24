@@ -9,12 +9,14 @@ import {
   Image,
   FlatList,
   SafeAreaView,
+  
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 import Icon, { FeatherIcon } from "react-native-vector-icons/Feather";
 import Tableinfo from "./Tableinfo";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
 import { firebase } from "./config";
 import {
   doc,
@@ -24,13 +26,16 @@ import {
   getDocs,
   query,
   QuerySnapshot,
+  where
 } from "firebase/firestore";
-
 
 // create a component
 const Tablefood = () => {
 
   const food = firebase.firestore().collection("fooditems");
+  const table = firebase.firestore().collection("Table");
+  const db=firebase.firestore();
+
   const [tab, settab] = useState([]);
 
   const fetch = async () => {
@@ -51,8 +56,26 @@ const Tablefood = () => {
 
   useEffect(() => {
     fetch();
-  });
- 
+  },[]);
+
+  // const q= query(table,where("userId","==","myKey"));
+
+
+  const addCart=async(item)=>{
+    try {
+      const documentId = await AsyncStorage.getItem('myKey');
+      console.log(item);
+      if (documentId !== null) {
+        console.log(documentId)
+        const documentSnapshot = await db.collection('Table').doc(documentId).get();
+        const documentData = documentSnapshot.data();
+        const updatedCart = [...documentData.cart, item];
+        await db.collection("Table").doc(documentId).update({cart: updatedCart})
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <View >
@@ -65,6 +88,13 @@ const Tablefood = () => {
               <Text style={styles.nameText}>{item.ItemName}</Text>
               <Text style={styles.priceText}>{"₹"+item.Price}</Text>
             </View>
+            <TouchableOpacity onPress={()=>{
+              addCart(item);
+            }}>
+            <View style={{backgroundColor:"green",borderRadius:5,marginTop:30}}>
+              <Text style={{color:"white",fontSize:20,paddingTop:10}}>Add To cart</Text>
+            </View>
+            </TouchableOpacity>
 
             </View>
         )}

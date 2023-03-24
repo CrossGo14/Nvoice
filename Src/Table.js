@@ -7,11 +7,13 @@ import {
   TouchableOpacity,
   Button,
   Image,
+  Pressable,
   FlatList,
+  Keyboard,
+  SafeAreaView,TextInput
 } from "react-native";
 import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 import Icon, { FeatherIcon } from "react-native-vector-icons/Feather";
-import Tableinfo from "./Tableinfo";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { firebase } from "./config";
@@ -25,60 +27,198 @@ import {
   QuerySnapshot,
 } from "firebase/firestore";
 import Tablefood from "./Tablefood";
+import uuid from "react-native-uuid";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 
 
 // create a component
 const Table = () => {
+
   const Navigation = useNavigation();
   const Stack = createNativeStackNavigator();
 
   const table = firebase.firestore().collection("Table");
+  const db=firebase.firestore();
 
-  const [tab, settab] = useState([]);
+  const[tabs,settabs]=useState([]);
 
-  const [MasterData, setMasterData] = useState([]);
+  const [tableno, settableno] = useState("");
+
+
 
   const fetch = async () => {
     table.onSnapshot((querySnapshot) => {
-      const tab = [];
+      console.log(querySnapshot)
+      const tabs = [];
       querySnapshot.forEach((doc) => {
-        const { Tableno } = doc.data();
-        tab.push({
+        console.log(doc.data())
+        const { Tableno, cart } = doc.data();
+        tabs.push({
           id: doc.id,
           Tableno,
+          cart
+          
         });
+        console.log(tabs)
         return () => {};
       });
-      settab(tab);
+      settabs(tabs);
     });
   };
 
+  // const fetch=()=>{
+  //   table
+  //   .collection
+  // }
+
   useEffect(() => {
     fetch();
-  });
+  }, []);
+
+
+  // const addtable = () => {
+  //   if(!tableno)
+  //   return alert("Table field is empty")
+  //   const data = {
+  //     Tableno: tableno,
+  //     userId:userId,
+  //     cart:[],
+  
+  //   };
+  //   console.log("Data has been added",data);
+  //    table
+  //     .add(data)
+  //     .then(() => {
+  //       console.log('data uploaded successs')
+  //       settableno(""), Keyboard.dismiss()
+  //     })
+  //     .catch((error) => {
+  //       console.log(error)
+  //       alert(error);
+  //     });
+  //   alert("Table Added");
+  // };
+
+  const userId=uuid.v4();
+
+  const addtable = async() => {
+    if(!tableno)
+    return alert("Table field is empty")
+    const data = {
+      Tableno: tableno,
+      userId:userId,
+      cart:[],
+    };
+    console.log("Data has been added",data);
+     table
+     .doc(userId)
+      .set(data)
+      .then(async() => {
+        console.log('data uploaded successs')
+        settableno(""), Keyboard.dismiss();
+
+        readDataFromAsyncStorage();
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error);
+      });
+    alert("Table Added");
+  };
+
+
+  const readDataFromAsyncStorage = async () => {
+    try {
+      const documentId = await AsyncStorage.getItem('myKey');
+      if (documentId !== null) {
+        const documentSnapshot = await db.collection('Table').doc(documentId).get();
+        const documentData = documentSnapshot.data();
+        console.log(documentData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const goToNextScreen = async (userId, mobile, name) => {
+    if (userId) {
+      await AsyncStorage.setItem('USERID', userId);
+      console.log("data stored onto local storage");
+    }
+    // navigation.navigate('Tablefood');
+  };
+
+ 
+
+  const addDataAndSaveId = async (data) => {
+    try {
+      const docRef = firebase.firestore().collection('Table');
+      const docId = docRef.id;
+      await AsyncStorage.setItem('TABLEID', docId);
+      console.log("Asyncdata added");
+      const value=AsyncStorage.getItem("TABLEID");
+      console.log("Value is"+JSON.stringify(value));
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  
+
 
   return (
     <View>
-      <View style={styles.floatingbutton}>
-        <TouchableOpacity onPress={() => Navigation.navigate("Tableinfo")}>
-          <Icon name="plus-square" size={34}></Icon>
-        </TouchableOpacity>
-      </View>
-      <View></View>
-
+     
       <FlatList
         numColumns={2}
         keyExtractor={(item) => item.id}
-        data={tab}
+        data={tabs}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.container} onPress={() => Navigation.navigate("Tablefood")}>
+          <TouchableOpacity style={styles.container} onPress={async () => {
+            const documentId = item.id;
+            await AsyncStorage.setItem('myKey', documentId);
+            Navigation.navigate("Tablefood")
+          }}>
             <View styl={styles.innerContainer}>
               <Text>{item.Tableno}</Text>
             </View>
           </TouchableOpacity>
         )}
       />
+
+{/* <SafeAreaView style={styles.input}>
+      <View style={styles.action}>
+        <TextInput
+          placeholder="Enter Number"
+          value={tableno}
+          onChangeText={(text) => settableno(text)}
+          style={styles.textinput}
+        />
+        <TouchableOpacity onPress={addtable}>
+          <Text style={styles.tick}>✓</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView> */}
+
+    <View style={styles.footer}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            value={tableno}
+            placeholder="Add Todo"
+            onChangeText={text => settableno(text)}
+          />
+           <TouchableOpacity onPress={addtable}>
+          <View style={styles.iconContainer}>
+            <Icon name="plus" size={20}></Icon>
+          </View>
+        </TouchableOpacity>
+        </View>
+        </View>
+
+    
     </View>
   );
 };
@@ -115,8 +255,61 @@ flexDirection: "column",
   //     width:50,
   //     height:50,
   //     marginRight:
-  // }
+  // },
+  action: {
+    flexDirection: "row",
+    marginTop: 10,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f2f2f2",
+    paddingBottom: 5,
+    fontSize: 30,
+  },
+  textinput: {
+    borderBottomWidth: 0.5,
+    fontSize: 20,
+    width:300,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    flexDirection:"row"
+  },
+  modalBG: {
+    flex: 1,
+    zIndex: -1,
+  },
+  input:{
+    marginTop:550
+  },
+  footer: {
+    position:"absolute",
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop:scale(490)
+  },
+  inputContainer: {
+    height: 50,
+    paddingHorizontal: 20,
+    elevation: 40,
+    backgroundColor:"white",
+    flex: 1,
+    marginVertical: 20,
+    marginRight: 20,
+    borderRadius: 30,
+  },
+  iconContainer: {
+    // height: 50,
+    // width: 50,
+    // elevation: 40,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft:scale(240)
+  },
 });
+
 
 //make this component available to the app
 export default Table;

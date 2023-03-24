@@ -3,6 +3,7 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
 
+
 const firebaseConfig = {
     apiKey: "AIzaSyBE-tKZNjaFJGBaRQ1WlexmPQoi2-wQcYk",
     authDomain: "nvoice-ef063.firebaseapp.com",
@@ -15,5 +16,6 @@ const firebaseConfig = {
 
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
+    firebase.firestore().settings({ experimentalForceLongPolling: true }); //add this..
     }
     export { firebase };

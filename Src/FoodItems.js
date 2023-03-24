@@ -51,7 +51,7 @@ const Tablefood = () => {
 
   useEffect(() => {
     fetch();
-  });
+  },[]);
  
 
   return (
@@ -65,7 +65,6 @@ const Tablefood = () => {
               <Text style={styles.nameText}>{item.ItemName}</Text>
               <Text style={styles.priceText}>{"₹"+item.Price}</Text>
             </View>
-
             </View>
         )}
       />
