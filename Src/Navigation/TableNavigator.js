@@ -8,6 +8,7 @@ import BottomTab from './BottomTab';
 import Table from '../Table';
 import Login from '../Login';
 import Tablefood from '../Tablefood';
+import Cart from '../Cart';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,8 @@ function ProfileNavigator() {
         <Stack.Screen name="Table" component={Table} />
         {/* <Stack.Screen name="Tableinfo" component={Tableinfo} /> */}
         <Stack.Screen name="Tablefood" component={Tablefood} />
+        <Stack.Screen name="Cart" component={Cart} />
+
 
     </Stack.Navigator>
   );
