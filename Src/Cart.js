@@ -27,6 +27,11 @@ import {
   QuerySnapshot,
   where,
 } from "firebase/firestore";
+import * as Print from "expo-print";
+import { shareAsync } from "expo-sharing";
+import uuid from "react-native-uuid";
+import moment from "moment";
+
 
 // create a component
 const Cart = () => {
@@ -34,13 +39,13 @@ const Cart = () => {
 
   const [cartcount, setcartcount] = useState();
 
-  const[totalPrice,setTotalPrice]=useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
 
+  const [selectedPrinter, setSelectedPrinter] = React.useState();
 
   const food = firebase.firestore().collection("fooditems");
   const table = firebase.firestore().collection("Table");
   const db = firebase.firestore();
-
 
   const Navigation = useNavigation();
 
@@ -54,23 +59,12 @@ const Cart = () => {
     Total(documentData.cart);
   };
 
-
   useEffect(() => {
     cartItem();
-
   }, []);
 
-  const getTotal = () => {
-    let total = 0;
-    cartlist.map(item => {
-      total = total + item.data.qty * item.data.discountPrice;
-    });
-    return total;
-  };
-
-  const increaseCount=async(item)=>{
-    // console.log("increased")
-    console.log(item.qty)
+  const increaseCount = async (item) => {
+    console.log(item.qty);
     try {
       const documentId = await AsyncStorage.getItem("myKey");
       console.log(item);
@@ -92,27 +86,24 @@ const Cart = () => {
           return itm;
         });
 
-        if(!existing)
-          updatedCart = [...documentData.cart, item];
-          console.log(updatedCart);
+        if (!existing) updatedCart = [...documentData.cart, item];
+        console.log(updatedCart);
 
         await db
           .collection("Table")
           .doc(documentId)
           .update({ cart: updatedCart });
 
-          cartItem();
-          console.log(cartlist)
+        cartItem();
+        console.log(cartlist);
       }
     } catch (error) {
       console.log(error);
     }
+  };
 
-
-  }
-
-  const decreaseCount=async(item)=>{
-    console.log("decreased")
+  const decreaseCount = async (item) => {
+    console.log("decreased");
     try {
       const documentId = await AsyncStorage.getItem("myKey");
       console.log(item);
@@ -132,11 +123,11 @@ const Cart = () => {
           return itm;
         });
 
-        console.log('-===============')
-        console.log(updatedCart)
+        console.log("-===============");
+        console.log(updatedCart);
 
         updatedCart = documentData.cart.filter((itm) => {
-          return itm.qty
+          return itm.qty;
         });
 
         await db
@@ -144,40 +135,155 @@ const Cart = () => {
           .doc(documentId)
           .update({ cart: updatedCart });
 
-          cartItem();
-          console.log(cartlist)
+        cartItem();
+        console.log(cartlist);
       }
     } catch (error) {
       console.log(error);
     }
+  };
 
-
-  }
-
-
-  const itemCount=(documentData)=>{
-    
-    let totalLength=0
+  const itemCount = (documentData) => {
+    let totalLength = 0;
     documentData.cart.forEach((item) => {
       totalLength += item.qty;
-    })
+    });
     setcartcount(totalLength);
     console.log(cartcount);
-  }
+  };
 
-  const Total=(cart)=>{
-    let Total=0;
-    cart.forEach(item=>{
-      console.log(item)
-      Total+=parseInt(item.Price)*item.qty;
-      
-    
-    })
-    setTotalPrice(Total)
-console.log({Total})
-  }
+  const Total = (cart) => {
+    let Total = 0;
+    cart.forEach((item) => {
+      // console.log(item)
+      console.log(cartlist);
+      Total += parseInt(item.Price) * item.qty;
+    });
+    setTotalPrice(Total);
+    console.log({ Total });
+  };
 
 
+  const userId = uuid.v4();
+
+  const createHTML = (cartlist) => {
+    console.log(cartlist)
+
+    let itemString = '';
+    for (const cartItem of cartlist){
+      itemString += `          <tr>
+      <td>${cartItem.ItemName}</td>
+      <td>${cartItem.qty}</td>
+      <td>${cartItem.Price}</td>
+      <td>${parseInt(cartItem.Price)*parseInt(cartItem.qty)}</td>
+    </tr>`
+    }
+
+    return `
+    <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Invoice</title>
+    <style>
+      /* Add your invoice CSS styles here */
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid black;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+      .invoice-header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .invoice-header p {
+        margin: 0;
+        font-size: 14px;
+      }
+      .invoice-details {
+        border: 1px solid black;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+      .invoice-details h2 {
+        margin-top: 0;
+      }
+      .invoice-details p {
+        margin: 0;
+      }
+      .invoice-items {
+        margin-bottom: 20px;
+      }
+      .invoice-items th {
+        text-align: left;
+        border-bottom: 1px solid black;
+        padding-bottom: 5px;
+      }
+      .invoice-items td {
+        border-bottom: 1px solid lightgray;
+        padding: 5px 0;
+      }
+      .invoice-total {
+        display: flex;
+        justify-content: flex;
+      }
+      .invoice-total p {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice-header">
+      <h1>Invoice</h1>
+      <p>Invoice: ${userId}</p>
+    </div>
+    <div class="invoice-details">
+      <h2>Invoice Details</h2>
+      <p>Invoice Date: ${moment().format('LLLL')} </p>
+
+      <!-- Add more invoice details here -->
+    </div>
+    <table class="invoice-items">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+  
+${itemString}
+  
+      </tbody>
+    </table>
+    <div class="invoice-total">
+      <p>Total(*inclusive of all Taxes*):${totalPrice}</p>
+    </div>
+  </body>
+  </html>
+  `;
+  };
+
+
+  const printToFile = async () => {
+    // On iOS/android prints the given html. On web prints the HTML from the current page.
+    const { uri } = await Print.printToFileAsync({ html: createHTML(cartlist) });
+    console.log("File has been saved to:", uri);
+    await shareAsync(uri, { UTI: ".pdf", mimeType: "application/pdf",dialogTitle:"abcd" });
+  };
+
+  let generatePDF = async () => {
+    const file = await printToFile();
+    await shareAsync(file);
+  };
 
   return (
     <View style={styles.container}>
@@ -196,66 +302,92 @@ console.log({Total})
                 style={[
                   styles.addToCartBtn,
                   {
-                    flexDirection:'row',
+                    flexDirection: "row",
+                    width: 30,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // marginRight: 7,
+                  },
+                ]}
+                onPress={() => decreaseCount(item)}
+              >
+                <Text
+                  style={{ color: "green", fontSize: 20, fontWeight: "700" }}
+                > 
+                  -
+                </Text>
+              </TouchableOpacity>
+              <Text>{item.qty}</Text>
+              <TouchableOpacity
+                style={[
+                  styles.addToCartBtn,
+                  {
+                    flexDirection: "row",
                     width: 30,
                     justifyContent: "center",
                     alignItems: "center",
                     marginRight: 15,
                   },
                 ]}
-                onPress={()=>decreaseCount(item)}
+                onPress={() => increaseCount(item)}
               >
                 <Text
-                  style={{ color: "green", fontSize: 20, fontWeight: "700"}}> - </Text>
-                  </TouchableOpacity>
-
-                <Text>{item.qty}</Text>
-                  <TouchableOpacity
-                  style={[
-                    styles.addToCartBtn,
-                    {
-                      flexDirection:'row',
-                      width: 30,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginRight: 15,
-                    
-                    },
-                  ]}
-                  onPress={()=>increaseCount(item)}
-                  
-                  >
-                <Text style={{
-                      color: 'green',
-                      fontSize: 20,
-                      fontWeight: '700',
-                    }}>+</Text>
+                  style={{
+                    color: "green",
+                    fontSize: 20,
+                    fontWeight: "700",
+                  }}
+                >
+                  +
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
       />
+
       <View style={styles.checkoutView}>
-          <Text style={{color: '#000', fontWeight: '600'}}>
-            {"Items"+"\n"+cartcount}
-          </Text>
-          <TouchableOpacity
-            style={[
-              styles.addToCartBtn,
-              {
-                width: 100,
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-              },
-            ]}
-            onPress={() => {
-              Navigation.navigate('Checkout');
-            }}>
-            <Text style={{color: 'green'}}>Create Bill{totalPrice}</Text>
-            
-          </TouchableOpacity>
-        </View>
+        <Text
+          style={{
+            color: "green",
+            fontWeight: "600",
+            flexDirection: "row",
+            fontSize: 15,
+          }}
+        >
+          {"Items    " + cartcount}
+        </Text>
+
+        <TouchableOpacity
+          // style={[
+          //   styles.addToCartBtn,
+          //   {
+          //     width: 100,
+          //     height: 40,
+          //     justifyContent: 'center',
+          //     alignItems: 'center',
+          //   },
+          // ]}
+          onPress={() => {
+            generatePDF();
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "green",
+              borderRadius: 10,
+              width: scale(130),
+            }}
+          >
+            <Text style={{ color: "white", fontSize: 15, fontWeight: "bold" }}>
+              Create Bill
+            </Text>
+            <Text style={{ fontSize: 15, fontWeight: "bold", color: "white" }}>
+              Total Price ₹{totalPrice}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -302,15 +434,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkoutView: {
-    width: '100%',
+    width: "100%",
     height: 60,
-    backgroundColor: '#fff',
-    position: 'absolute',
+    backgroundColor: "#fff",
+    position: "absolute",
     bottom: 0,
     elevation: 5,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
   },
 });
 
