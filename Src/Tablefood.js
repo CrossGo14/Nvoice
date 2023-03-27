@@ -39,6 +39,8 @@ const Tablefood = () => {
   const Navigation = useNavigation();
 
   const [tab, settab] = useState([]);
+  const [cartcount, setcartcount] = useState();
+
 
   const fetch = async () => {
     food.onSnapshot((querySnapshot) => {
@@ -61,29 +63,7 @@ const Tablefood = () => {
 
   // const q= query(table,where("userId","==","myKey"));
 
-  // const addCart = async (item) => {
-  //   try {
-  //     const documentId = await AsyncStorage.getItem("myKey");
-  //     console.log(item);
-  //     if (documentId !== null) {
-  //       console.log(documentId);
-  //       const documentSnapshot = await db
-  //         .collection("Table")
-  //         .doc(documentId)
-  //         .get();
-  //       const documentData = documentSnapshot.data();
-  //       const updatedCart = [...documentData.cart, item];
-  //       await db
-  //         .collection("Table")
-  //         .doc(documentId)
-  //         .update({ cart: updatedCart });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  const addCart1 = async (item) => {
+  const addCart = async (item) => {
     try {
       const documentId = await AsyncStorage.getItem("myKey");
       console.log(item);
@@ -94,46 +74,78 @@ const Tablefood = () => {
           .doc(documentId)
           .get();
         const documentData = documentSnapshot.data();
-
-        const cartData=documentData.cart;
-
-          if(cartData.length>0){
-          let existing=false;
-          cartData.map(itm=>{
-            if(itm.id==item.id){
-              existing=true;
-              itm.qty=itm.qty+1;
-            }})
-            if(existing==false)
-          {
-            cartData.push(item)
-          }
-            const updatedCart = [...documentData.cart, item];
-            await db
-              .collection("Table")
-              .doc(documentId)
-              .update({ cart: updatedCart });
-        }else{
-          cartData.push(item);
-              }
-              const updatedCart = [...documentData.cart, item];
-            await db
-              .collection("Table")
-              .doc(documentId)
-              .update({ cart: updatedCart });
+        const updatedCart = [...documentData.cart, item];
+        await db
+          .collection("Table")
+          .doc(documentId)
+          .update({ cart: updatedCart });
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const [cartcount, setcartcount] = useState();
+  const addCart1 = async (item) => {
+    try {
+      const documentId = await AsyncStorage.getItem("myKey");
+      console.log(item);
+      item.qty = 1;
+      if (documentId !== null) {
+        console.log(documentId);
+        const documentSnapshot = await db
+          .collection("Table")
+          .doc(documentId)
+          .get();
+        const documentData = documentSnapshot.data();
+
+        let existing = false;
+        let updatedCart = documentData.cart.map((itm) => {
+          if (itm.id == item.id) {
+            existing = true;
+            if (itm.qty) itm.qty = itm.qty + 1;
+          }
+          return itm;
+        });
+
+        if(!existing)
+          updatedCart = [...documentData.cart, item];
+          console.log(updatedCart);
+
+          setcartcount(cartcount+1);
+
+        await db
+          .collection("Table")
+          .doc(documentId)
+          .update({ cart: updatedCart });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const Adding = async () => {
+    const documentId = await AsyncStorage.getItem("myKey");
+    const docRef = db.collection("Table").doc(documentId);
+    const doc = await docRef.get();
+
+    if (doc.exists) {
+      const existingData = doc.data();
+      const existingItemIndex = existingData.items.findIndex(
+        (item) => item.id === newItem.id
+      );
+    }
+  };
+
 
   const cartCountFn = async () => {
     const documentId = await AsyncStorage.getItem("myKey");
     const documentSnapshot = await db.collection("Table").doc(documentId).get();
     const documentData = documentSnapshot.data();
-    setcartcount(documentData.cart.length);
+    let totalLength=0
+    documentData.cart.forEach((item) => {
+      totalLength += item.qty;
+    })
+    setcartcount(totalLength);
     console.log(cartcount);
   };
 

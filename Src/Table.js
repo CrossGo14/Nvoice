@@ -156,15 +156,14 @@ const Table = () => {
     }
   };
 
-  const deleteTable = async () => {
-    const documentId = await AsyncStorage.getItem("myKey");
+  const deleteTable = async (documentId) => {
     table
       .doc(documentId)
       .delete()
       .then(() => {
         // show a successful alert
         alert("Deleted Successfully");
-        console.log(userId);
+        console.log(documentId);
       })
       .catch((error) => {
         alert(error);
@@ -193,7 +192,7 @@ const Table = () => {
                   name="delete"
                   size={23}
                   color={"red"}
-                  onPress={deleteTable}
+                  onPress={() => deleteTable(item.id)}
                   style={{ marginLeft: scale(90), position: "absolute" }}
                 ></Icon>
               </View>
