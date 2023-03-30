@@ -1,76 +1,131 @@
-//import liraries
-import React, { Component } from 'react';
-import { View, Text,TouchableOpacity} from 'react-native';
-import Background from './Background';
-import { brown } from './Constants';
-import Btn from './Btn';
-import Field from './Fields';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/core'
+import React, { useEffect, useState } from 'react'
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { firebase } from './config'
 import Bills from './Bills';
+import { auth } from './config';
 
+const LoginScreen = () => {
 
-// create a component
-const Login = (props) => {
-  const navigation = useNavigation();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const navigation = useNavigation()
 
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        navigation.navigate(Bills)
+      }
+    })
 
-    return (
-        <Background>
-        <View style={{alignItems: 'center', width: 460}}>
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 64,
-              fontWeight: 'bold',
-              marginVertical: 25,
-            }}>
-            Login
-          </Text>
-          <View
-            style={{
-              backgroundColor: 'white',
-              height: 700,
-              width: 460,
-              borderTopLeftRadius: 130,
-              paddingTop: 100,
-              alignItems: 'center',
-            }}>
-            <Text style={{fontSize: 40, color: brown, fontWeight: 'bold'}}> Welcome Back </Text>
-            <Text
-              style={{
-                color: 'grey',
-                fontSize: 19,
-                fontWeight: 'bold',
-                marginBottom: 20,
-              }}>
-              Login to your account </Text>
-            <Field
-              placeholder="Email / Username"
-              keyboardType={'email-address'}
-            />
-            <Field placeholder="Password" secureTextEntry={true} />
-            <View
-              style={{alignItems: 'flex-end', width: '78%', paddingRight: 16, marginBottom: 200}}>
-              <Text style={{color: brown, fontWeight: 'bold', fontSize: 16}}>
-                Forgot Password ?
-              </Text>
-            </View>
+    return unsubscribe
+  }, [])
 
-            <Btn bgcolor={brown} txtcolor='white' btnlabel="Login" Press={()=>navigation.navigate(Bills) }/>
+  const handleSignUp = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then(userCredentials => {
+        const user = userCredentials.user;
+        console.log('Registered with:', user.email);
+      })
+      .catch(error => alert(error.message))
+  }
 
-            <View style={{ display: 'flex', flexDirection :'row', justifyContent: "center" }}>
-              <Text style={{ fontSize: 16, fontWeight:"bold" }}>Don't have an account ? </Text>
-              <TouchableOpacity onPress={() => props.navigation.navigate("Signup")}>
-              <Text style={{ color: brown, fontWeight: 'bold', fontSize: 16 }}>Signup</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Background>
-    );
-};
+  const handleLogin = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then(userCredentials => {
+        const user = userCredentials.user;
+        console.log('Logged in with:', user.email);
+      })
+      .catch(error => alert(error.message))
+  }
+  
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior="padding"
+    >
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={text => setEmail(text)}
+          autoCapitalize="none"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={text => setPassword(text)}
+          style={styles.input}
+          secureTextEntry={true}
+        />
+      </View>
 
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={handleLogin}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSignUp}
+          style={[styles.button, styles.buttonOutline]}
+        >
+          <Text style={styles.buttonOutlineText}>Register</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  )
+}
 
+export default LoginScreen
 
-//make this component available to the app
-export default Login;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputContainer: {
+    width: '80%'
+  },
+  input: {
+    backgroundColor: 'white',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 5,
+  },
+  buttonContainer: {
+    width: '60%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  button: {
+    backgroundColor: '#0782F9',
+    width: '100%',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonOutline: {
+    backgroundColor: 'white',
+    marginTop: 5,
+    borderColor: '#0782F9',
+    borderWidth: 2,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  buttonOutlineText: {
+    color: '#0782F9',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+})

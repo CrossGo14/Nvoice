@@ -15,13 +15,14 @@ const Tab = createBottomTabNavigator();
 function BottomTab() {
   return (
     <Tab.Navigator>
+{/*       
       <Tab.Screen name="Bills" component={Bills} 
       options={{tabBarIcon: ({focused})=>{
     return(
     <Icon name='book' size={20}></Icon>
     )
     }}}
-/> 
+/>  */}
       <Tab.Screen name="Food" component={FoodNavigator}
        options={{tabBarIcon: ({focused})=>{
         return(
@@ -36,12 +37,12 @@ function BottomTab() {
         )
         }}}/>
 
-      <Tab.Screen name="Profile" component={ProfileNavigator}
+      {/* <Tab.Screen name="Profile" component={ProfileNavigator}
        options={{tabBarIcon: ({focused})=>{
         return(
         <Icon name='user' size={20}></Icon>
         )
-        }}} />
+        }}} /> */}
 
 
      
